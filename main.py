@@ -132,7 +132,7 @@ class NewPostHandler(BlogHandler):
             post = Post(
                 title=title,
                 body=body,
-                author=self.user)
+                author= self.user)
             post.put()
 
             # get the id of the new post, so we can render the post's page (via the permalink)
@@ -288,7 +288,7 @@ class LogoutHandler(BlogHandler):
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/blog', BlogIndexHandler),
-    ('/blog/newpost', NewPostHandler),
+    ('/newpost', NewPostHandler),
     webapp2.Route('/blog/<id:\d+>', ViewPostHandler),
     webapp2.Route('/blog/<username:[a-zA-Z0-9_-]{3,20}>', BlogIndexHandler),
     ('/signup', SignupHandler),
