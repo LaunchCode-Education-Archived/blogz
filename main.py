@@ -298,5 +298,5 @@ app = webapp2.WSGIApplication([
 
 # A list of paths that a user must be logged in to access
 auth_paths = [
-    '/blog/newpost'
+    '/newpost'
 ]
