@@ -15,13 +15,8 @@ class BlogHandler(webapp2.RequestHandler):
         return query.fetch(limit=limit, offset=offset)
 
     def get_posts_by_user(self, user, limit, offset):
-        """
-            Get all posts by a specific user, ordered by creation date (descending).
-            The user parameter will be a User object.
-        """
-
-        # TODO - filter the query so that only posts by the given user
-        return None
+        query = Post.all().filter('author =',user)
+        return query.fetch(limit=limit, offset=offset)
 
     def get_user_by_name(self, username):
         """ Get a user object from the db, based on their username """
@@ -137,7 +132,7 @@ class NewPostHandler(BlogHandler):
             post = Post(
                 title=title,
                 body=body,
-                author=self.user)
+                author= self.user)
             post.put()
 
             # get the id of the new post, so we can render the post's page (via the permalink)
@@ -260,10 +255,10 @@ class LoginHandler(BlogHandler):
 
     # TODO - The login code here is mostly set up for you, but there isn't a template to log in
 
-    def render_login_form(self, error=""):
+    def render_login_form(self, error="", username=""):
         """ Render the login form with or without an error, based on parameters """
         t = jinja_env.get_template("login.html")
-        response = t.render(error=error)
+        response = t.render(error=error,username=username)
         self.response.out.write(response)
 
     def get(self):
@@ -277,12 +272,12 @@ class LoginHandler(BlogHandler):
         user = self.get_user_by_name(submitted_username)
 
         if not user:
-            self.render_login_form(error="Invalid username")
+            self.render_login_form(error="Invalid username", username = submitted_username)
         elif hashutils.valid_pw(submitted_username, submitted_password, user.pw_hash):
             self.login_user(user)
             self.redirect('/blog/newpost')
         else:
-            self.render_login_form(error="Invalid password")
+            self.render_login_form(error="Invalid password", username = submitted_username)
 
 class LogoutHandler(BlogHandler):
 
@@ -293,7 +288,7 @@ class LogoutHandler(BlogHandler):
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/blog', BlogIndexHandler),
-    ('/blog/newpost', NewPostHandler),
+    ('/newpost', NewPostHandler),
     webapp2.Route('/blog/<id:\d+>', ViewPostHandler),
     webapp2.Route('/blog/<username:[a-zA-Z0-9_-]{3,20}>', BlogIndexHandler),
     ('/signup', SignupHandler),
@@ -303,5 +298,5 @@ app = webapp2.WSGIApplication([
 
 # A list of paths that a user must be logged in to access
 auth_paths = [
-    '/blog/newpost'
+    '/newpost'
 ]
